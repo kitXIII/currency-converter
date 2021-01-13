@@ -2,6 +2,10 @@
 import { REQUEST_STATUSES } from 'constants/index';
 
 const initialState = {
+    symbolFrom: '',
+    symbolTo: '',
+    valueFrom: 1,
+    valueTo: null,
     symbols: [],
     latestRates: {},
     getLatestRequestStatus: REQUEST_STATUSES.INIT,

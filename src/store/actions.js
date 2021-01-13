@@ -5,6 +5,11 @@ import keys from 'lodash/keys';
 
 import Api from 'services/Api'
 
+export const setSymbolFrom = createAction('SET_FROM_SYMBOL');
+export const setValueFrom = createAction('SET_FROM_VALUE');
+export const setSymbolTo = createAction('SET_TO_SYMBOL');
+export const setValueTo = createAction('SET_TO_VALUE');
+
 // GET SYMBOL LIST
 export const getSymbolListPending = createAction('GET_SYMBOL_LIST_PENDING');
 export const getSymbolListSuccess = createAction('GET_SYMBOL_LIST_SUCCESS');
@@ -30,6 +35,7 @@ export const getSymbolList = () => async (dispatch) => {
 export const getLatestPending = createAction('GET_LATEST_PENDING');
 export const getLatestSuccess = createAction('GET_LATEST_SUCCESS');
 export const getLatestFailure = createAction('GET_LATEST_FAILURE');
+export const resetGetLatestFailure = createAction('RESET_GET_LATEST_FAILURE');
 
 export const getLatestForSymbols = (symbols) => async (dispatch) => {
     dispatch(getLatestPending());

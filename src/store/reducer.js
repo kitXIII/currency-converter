@@ -3,6 +3,11 @@ import { REQUEST_STATUSES } from 'constants/index';
 
 const initReducer = (initialState, actions) => {
     return createReducer(initialState, {
+        [actions.setSymbolFrom]: (state, action) => ({ ...state, symbolFrom: action.payload }),
+        [actions.setValueFrom]: (state, action) => ({ ...state, valueFrom: action.payload }),
+        [actions.setSymbolTo]: (state, action) => ({ ...state, symbolTo: action.payload }),
+        [actions.setValueTo]: (state, action) => ({ ...state, valueTo: action.payload }),
+
         // SYMBOL LIST
         [actions.getSymbolListPending]: (state) => ({
             ...state,
@@ -11,6 +16,8 @@ const initReducer = (initialState, actions) => {
         }),
         [actions.getSymbolListSuccess]: (state, action) => ({
             ...state,
+            symbolFrom: action.payload[0],
+            symbolTo: action.payload[1],
             symbols: action.payload,
             getSymbolListRequestStatus: REQUEST_STATUSES.SUCCESS
         }),
@@ -18,6 +25,11 @@ const initReducer = (initialState, actions) => {
             ...state,
             getSymbolListRequestError: action.payload,
             getSymbolListRequestStatus: REQUEST_STATUSES.FAILURE
+        }),
+        [actions.resetGetLatestFailure]: (state, action) => ({
+            ...state,
+            getSymbolListRequestError: initialState.getSymbolListRequestError,
+            getSymbolListRequestStatus: REQUEST_STATUSES.INIT
         }),
 
         // LATEST RATES FOR 2 SYMBOLS

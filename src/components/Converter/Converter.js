@@ -1,25 +1,131 @@
-import { useSelector, useDispatch, actions } from 'store';
+import { useMemo, useEffect, useRef, useState } from 'react';
 
-import { REQUEST_STATUSES } from 'constants/index';
+import get from 'lodash/get';
+import keys from 'lodash/keys';
+import isString from 'lodash/isString';
+
+import Alert from '@material-ui/lab/Alert';
+import AlertTitle from '@material-ui/lab/AlertTitle';
+import FormControl from '@material-ui/core/FormControl';
+import InputLabel from '@material-ui/core/InputLabel';
+import InputBase from '@material-ui/core/InputBase';
+import MenuItem from '@material-ui/core/MenuItem';
+import Select from '@material-ui/core/Select';
+import Paper from '@material-ui/core/Paper';
+
+import { useSelector, useDispatch, actions } from 'store';
+import selectStatusHelper from 'utils/statuses';
+
+import useStyles from './useStyles';
+
+const latestRequestStatusSelector = (state) => state.getLatestRequestStatus;
 
 const App = () => {
-    const latestRequestStatus = useSelector((state) => state.getLatestRequestStatus);
-    const dispatch = useDispatch();
+    const styles = useStyles();
 
-    const handleClick = () => {
-        if (latestRequestStatus === REQUEST_STATUSES.PENDING) {
+    const lastRequestedSymbolFrom = useRef();
+    const lastRequestedSymbolTo = useRef();
+
+    const dispatch = useDispatch();
+    const latestRequestStatus = useSelector(selectStatusHelper(latestRequestStatusSelector));
+
+    const symbolFrom = useSelector((state) => state.symbolFrom);
+    const symbolTo = useSelector((state) => state.symbolTo);
+
+    const symbols = useSelector((state) => state.symbols);
+    const symbolsFrom = symbols.filter((s) => s !== symbolTo);
+    const symbolsTo = symbols.filter((s) => s !== symbolFrom);
+
+    const handleSelectFromSymbol = (e) => dispatch(actions.setSymbolFrom(e.target.value));
+    const handleSelectToSymbol = (e) => dispatch(actions.setSymbolTo(e.target.value));
+
+    const latestRates = useSelector((state) => state.latestRates);
+    const ratioSymbolFrom = useMemo(() => get(latestRates, 'base', null), [latestRates]);
+    const rates = useMemo(() => get(latestRates, 'rates', {}), [latestRates]);
+    const ratioSymbolTo = useMemo(() => keys(rates).find((key) => key !== ratioSymbolFrom), [rates, ratioSymbolFrom]);
+
+    useEffect(() => {
+        if (lastRequestedSymbolFrom.current === symbolFrom && lastRequestedSymbolTo.current === symbolTo) {
             return;
         }
 
-        dispatch(actions.getLatestForSymbols({ from: 'USD', to: 'EUR' }));
-    };
+        if (latestRequestStatus.isPending) {
+            return;
+        }
+
+        lastRequestedSymbolFrom.current = symbolFrom;
+        lastRequestedSymbolTo.current = symbolTo;
+
+        dispatch(actions.getLatestForSymbols({ from: symbolFrom, to: symbolTo }));
+    }, [dispatch, symbolFrom, latestRequestStatus, symbolTo]);
+
+    const error = useSelector((state) => state.getLatestRequestError);
+    const [errorMessage, setErrorMessage] = useState(null);
+    useEffect(() => {
+        if (!error) {
+            return setErrorMessage(null);
+        }
+
+        if (!error.response) {
+            return setErrorMessage('Network connection problem');
+        }
+
+        if (error.response.data?.error && isString(error.response.data.error)) {
+            setErrorMessage(error.response.data.error);
+        }
+    }, [error]);
 
     return (
-        <div className='App'>
-            <button type='button' onClick={handleClick}>
-                click me
-            </button>
-        </div>
+        <>
+            <Paper className={styles.paper}>
+                <div className={styles.column}>
+                    <FormControl className={styles.formControl}>
+                        <InputLabel id='from-select-label'>From</InputLabel>
+                        <Select
+                            labelId='from-select-label'
+                            id='from-select'
+                            value={symbolFrom}
+                            onChange={handleSelectFromSymbol}
+                        >
+                            {symbolsFrom.map((s) => (
+                                <MenuItem key={s} value={s}>
+                                    {s}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                    <FormControl className={styles.formControl}>
+                        <InputBase className={styles.input} />
+                    </FormControl>
+                </div>
+                <div className={styles.column}>
+                    <FormControl className={styles.formControl}>
+                        <InputLabel id='to-select-label'>To</InputLabel>
+                        <Select
+                            labelId='to-select-label'
+                            id='to-select'
+                            value={symbolTo}
+                            onChange={handleSelectToSymbol}
+                        >
+                            {symbolsTo.map((s) => (
+                                <MenuItem key={s} value={s}>
+                                    {s}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                    <FormControl className={styles.formControl}>
+                        <InputBase className={styles.input} />
+                    </FormControl>
+                </div>
+            </Paper>
+            {errorMessage && (
+                <Alert severity='error'>
+                    <AlertTitle>Error</AlertTitle>
+                    {errorMessage}
+                </Alert>
+            )}
+        </>
     );
 };
 

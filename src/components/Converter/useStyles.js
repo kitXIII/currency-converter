@@ -1,23 +1,29 @@
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme) => ({
-    root: {
-        flexGrow: 1
-    },
     paper: {
+        marginTop: theme.spacing(3),
+        marginBottom: theme.spacing(3),
         padding: theme.spacing(2),
-        margin: 'auto',
-        maxWidth: 500
+        [theme.breakpoints.up(800 + theme.spacing(3) * 2)]: {
+            marginTop: theme.spacing(6),
+            marginBottom: theme.spacing(6),
+            padding: theme.spacing(3)
+        },
+        display: 'flex',
+        justifyContent: 'space-between'
     },
-    image: {
-        width: 128,
-        height: 128
+    column: {
+        width: '40%'
     },
-    img: {
-        margin: 'auto',
-        display: 'block',
-        maxWidth: '100%',
-        maxHeight: '100%'
+    formControl: {
+        'width': '100%',
+        '& + &': {
+            paddingTop: theme.spacing(2)
+        }
+    },
+    input: {
+        fontSize: '24px'
     }
 }));
 
