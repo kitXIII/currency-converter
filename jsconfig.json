@@ -2,13 +2,14 @@
     "compilerOptions": {
         "baseUrl": "./src",
         "paths": {
-            "AppDir/*": ["./*"],
-            "Components/*": ["./components/*"],
-            "Constants":  ["./constants/index.js"],
-            "Constants/*": ["./constants/*"],
-            "Services/*": ["./services/*"],
-            "Utils/*": ["./utils/*"]
+            "store": ["./store/index.js"],
+            "components/*": ["./components/*"],
+            "constants":  ["./constants/index.js"],
+            "constants/*": ["./constants/*"],
+            "services/*": ["./services/*"],
+            "utils/*": ["./utils/*"]
         }
     },
+    "include": ["src"],
     "exclude": ["node_modules"]
 }
