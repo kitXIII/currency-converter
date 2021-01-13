@@ -1,7 +1,32 @@
 import { createAction } from '@reduxjs/toolkit';
+
 import get from 'lodash/get';
+import keys from 'lodash/keys';
+
 import Api from 'services/Api'
 
+// GET SYMBOL LIST
+export const getSymbolListPending = createAction('GET_SYMBOL_LIST_PENDING');
+export const getSymbolListSuccess = createAction('GET_SYMBOL_LIST_SUCCESS');
+export const getSymbolListFailure = createAction('GET_SYMBOL_LIST_FAILURE');
+
+export const getSymbolList = () => async (dispatch) => {
+    dispatch(getSymbolListPending());
+
+    try {
+        const result = await Api.getLatest();
+
+        const first = get(result, 'base', null);
+        const other = keys(get(result, 'rates', {}));
+        const symbols = [first, ...other].filter(v => v);
+
+        dispatch(getSymbolListSuccess(symbols));
+    } catch (error) {
+        dispatch(getSymbolListFailure(error));
+    }
+}
+
+// GET LATEST RATES FOR 2 SYMBOLS
 export const getLatestPending = createAction('GET_LATEST_PENDING');
 export const getLatestSuccess = createAction('GET_LATEST_SUCCESS');
 export const getLatestFailure = createAction('GET_LATEST_FAILURE');

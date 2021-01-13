@@ -1,18 +1,33 @@
+import { useEffect } from 'react';
 import { useSelector, useDispatch, actions } from 'store';
 
 import { REQUEST_STATUSES } from 'constants/index';
 
 const App = () => {
-    const requestStatus = useSelector((state) => state.getLatestStatus);
+    const latestRequestStatus = useSelector((state) => state.getLatestRequestStatus);
+    const symbolsRequestStatus = useSelector((state) => state.getSymbolListRequestStatus);
+
     const dispatch = useDispatch();
 
+    useEffect(() => {
+        dispatch(actions.getSymbolList());
+    }, [dispatch]);
+
     const handleClick = () => {
-        if (requestStatus === REQUEST_STATUSES.PENDING) {
+        if (latestRequestStatus === REQUEST_STATUSES.PENDING) {
             return;
         }
 
         dispatch(actions.getLatestForSymbols({ from: 'USD', to: 'EUR' }));
     };
+
+    if (symbolsRequestStatus === REQUEST_STATUSES.PENDING) {
+        return 'Loading...'
+    }
+
+    if (symbolsRequestStatus === REQUEST_STATUSES.FAILURE) {
+        return 'Error...';
+    }
 
     return (
         <div className='App'>

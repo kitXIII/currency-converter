@@ -3,20 +3,38 @@ import { REQUEST_STATUSES } from 'constants/index';
 
 const initReducer = (initialState, actions) => {
     return createReducer(initialState, {
+        // SYMBOL LIST
+        [actions.getSymbolListPending]: (state) => ({
+            ...state,
+            getSymbolListRequestError: initialState.getSymbolListRequestError,
+            getSymbolListRequestStatus: REQUEST_STATUSES.PENDING
+        }),
+        [actions.getSymbolListSuccess]: (state, action) => ({
+            ...state,
+            symbols: action.payload,
+            getSymbolListRequestStatus: REQUEST_STATUSES.SUCCESS
+        }),
+        [actions.getLatestFailure]: (state, action) => ({
+            ...state,
+            getSymbolListRequestError: action.payload,
+            getSymbolListRequestStatus: REQUEST_STATUSES.FAILURE
+        }),
+
+        // LATEST RATES FOR 2 SYMBOLS
         [actions.getLatestPending]: (state) => ({
             ...state,
-            getLatestStatus: REQUEST_STATUSES.PENDING,
-            getLatestRequestError: initialState.getLatestRequestError
+            getLatestRequestError: initialState.getLatestRequestError,
+            getLatestRequestStatus: REQUEST_STATUSES.PENDING
         }),
         [actions.getLatestSuccess]: (state, action) => ({
             ...state,
             latestRates: action.payload,
-            getLatestStatus: REQUEST_STATUSES.SUCCESS
+            getLatestRequestStatus: REQUEST_STATUSES.SUCCESS
         }),
         [actions.getLatestFailure]: (state, action) => ({
             ...state,
-            getLatestStatus: REQUEST_STATUSES.FAILURE,
-            getLatestRequestError: action.payload
+            getLatestRequestError: action.payload,
+            getLatestRequestStatus: REQUEST_STATUSES.FAILURE
         })
     });
 };
