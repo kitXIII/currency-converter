@@ -6,12 +6,15 @@ import isString from 'lodash/isString';
 
 import Alert from '@material-ui/lab/Alert';
 import AlertTitle from '@material-ui/lab/AlertTitle';
+import Fab from '@material-ui/core/Fab';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import InputBase from '@material-ui/core/InputBase';
 import MenuItem from '@material-ui/core/MenuItem';
-import Select from '@material-ui/core/Select';
 import Paper from '@material-ui/core/Paper';
+import Select from '@material-ui/core/Select';
+import SwapHorizIcon from '@material-ui/icons/SwapHoriz';
+import SwapVertIcon from '@material-ui/icons/SwapVert';
 
 import { useSelector, useDispatch, actions } from 'store';
 import selectStatusHelper from 'utils/statuses';
@@ -38,6 +41,7 @@ const App = () => {
 
     const handleSelectFromSymbol = (e) => dispatch(actions.setSymbolFrom(e.target.value));
     const handleSelectToSymbol = (e) => dispatch(actions.setSymbolTo(e.target.value));
+    const handleChangeSymbols = () => dispatch(actions.changeSymbols());
 
     const latestRates = useSelector((state) => state.latestRates);
     const ratioSymbolFrom = useMemo(() => get(latestRates, 'base', null), [latestRates]);
@@ -98,6 +102,14 @@ const App = () => {
                         <InputBase className={styles.input} />
                     </FormControl>
                 </div>
+                <Fab
+                    className={styles.button_first}
+                    aria-label='change symbols'
+                    variant='extended'
+                    onClick={handleChangeSymbols}
+                >
+                    <SwapHorizIcon />
+                </Fab>
                 <div className={styles.column}>
                     <FormControl className={styles.formControl}>
                         <InputLabel id='to-select-label'>To</InputLabel>
@@ -119,6 +131,9 @@ const App = () => {
                     </FormControl>
                 </div>
             </Paper>
+            <Fab className={styles.button_second} aria-label='change symbols' onClick={handleChangeSymbols}>
+                <SwapVertIcon />
+            </Fab>
             {errorMessage && (
                 <Alert severity='error'>
                     <AlertTitle>Error</AlertTitle>

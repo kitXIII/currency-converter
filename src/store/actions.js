@@ -9,6 +9,7 @@ export const setSymbolFrom = createAction('SET_FROM_SYMBOL');
 export const setValueFrom = createAction('SET_FROM_VALUE');
 export const setSymbolTo = createAction('SET_TO_SYMBOL');
 export const setValueTo = createAction('SET_TO_VALUE');
+export const changeSymbols = createAction('CHANGE_SYMBOLS');
 
 // GET SYMBOL LIST
 export const getSymbolListPending = createAction('GET_SYMBOL_LIST_PENDING');

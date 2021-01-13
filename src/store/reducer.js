@@ -7,6 +7,11 @@ const initReducer = (initialState, actions) => {
         [actions.setValueFrom]: (state, action) => ({ ...state, valueFrom: action.payload }),
         [actions.setSymbolTo]: (state, action) => ({ ...state, symbolTo: action.payload }),
         [actions.setValueTo]: (state, action) => ({ ...state, valueTo: action.payload }),
+        [actions.changeSymbols]: (state) => ({
+            ...state,
+            symbolFrom: state.symbolTo,
+            symbolTo: state.symbolFrom
+        }),
 
         // SYMBOL LIST
         [actions.getSymbolListPending]: (state) => ({
