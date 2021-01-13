@@ -4,8 +4,8 @@
         "paths": {
             "store": ["./store/index.js"],
             "components/*": ["./components/*"],
-            "constants":  ["./constants/index.js"],
             "constants/*": ["./constants/*"],
+            "constants":  ["./constants/index.js"],
             "services/*": ["./services/*"],
             "utils/*": ["./utils/*"]
         }
