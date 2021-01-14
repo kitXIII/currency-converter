@@ -4,7 +4,7 @@ import { REQUEST_STATUSES } from 'constants/index';
 const initialState = {
     symbolFrom: '',
     symbolTo: '',
-    valueFrom: 1,
+    valueFrom: '1.00',
     valueTo: null,
     symbols: [],
     latestRates: {},

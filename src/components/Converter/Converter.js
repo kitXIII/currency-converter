@@ -9,7 +9,6 @@ import AlertTitle from '@material-ui/lab/AlertTitle';
 import Fab from '@material-ui/core/Fab';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
-import InputBase from '@material-ui/core/InputBase';
 import MenuItem from '@material-ui/core/MenuItem';
 import Paper from '@material-ui/core/Paper';
 import Select from '@material-ui/core/Select';
@@ -17,6 +16,7 @@ import SwapHorizIcon from '@material-ui/icons/SwapHoriz';
 import SwapVertIcon from '@material-ui/icons/SwapVert';
 
 import { useSelector, useDispatch, actions } from 'store';
+import InputNumeric from 'components/InputNumeric/InputNumeric';
 import selectStatusHelper from 'utils/statuses';
 
 import useStyles from './useStyles';
@@ -34,6 +34,8 @@ const App = () => {
 
     const symbolFrom = useSelector((state) => state.symbolFrom);
     const symbolTo = useSelector((state) => state.symbolTo);
+    const valueFrom = useSelector((state) => state.valueFrom);
+    const valueTo = useSelector((state) => state.valueTo);
 
     const symbols = useSelector((state) => state.symbols);
     const symbolsFrom = symbols.filter((s) => s !== symbolTo);
@@ -41,7 +43,11 @@ const App = () => {
 
     const handleSelectFromSymbol = (e) => dispatch(actions.setSymbolFrom(e.target.value));
     const handleSelectToSymbol = (e) => dispatch(actions.setSymbolTo(e.target.value));
+    const handleChangeToValue = (e) => dispatch(actions.setValueTo(e.target.value));
     const handleChangeSymbols = () => dispatch(actions.changeSymbols());
+
+    const handleChangeFromValue = (e) => dispatch(actions.setValueFrom(e.target.value));
+
 
     const latestRates = useSelector((state) => state.latestRates);
     const ratioSymbolFrom = useMemo(() => get(latestRates, 'base', null), [latestRates]);
@@ -90,6 +96,7 @@ const App = () => {
                             id='from-select'
                             value={symbolFrom}
                             onChange={handleSelectFromSymbol}
+                            disabled={latestRequestStatus.isPending}
                         >
                             {symbolsFrom.map((s) => (
                                 <MenuItem key={s} value={s}>
@@ -99,7 +106,11 @@ const App = () => {
                         </Select>
                     </FormControl>
                     <FormControl className={styles.formControl}>
-                        <InputBase className={styles.input} />
+                        <InputNumeric
+                            value={valueFrom}
+                            onChange={handleChangeFromValue}
+                            disabled={latestRequestStatus.isPending}
+                        />
                     </FormControl>
                 </div>
                 <Fab
@@ -118,6 +129,7 @@ const App = () => {
                             id='to-select'
                             value={symbolTo}
                             onChange={handleSelectToSymbol}
+                            disabled={latestRequestStatus.isPending}
                         >
                             {symbolsTo.map((s) => (
                                 <MenuItem key={s} value={s}>
@@ -127,7 +139,11 @@ const App = () => {
                         </Select>
                     </FormControl>
                     <FormControl className={styles.formControl}>
-                        <InputBase className={styles.input} />
+                        <InputNumeric
+                            value={valueTo}
+                            onChange={handleChangeToValue}
+                            disabled={latestRequestStatus.isPending}
+                        />
                     </FormControl>
                 </div>
             </Paper>

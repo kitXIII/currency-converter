@@ -5,7 +5,7 @@ import Typography from '@material-ui/core/Typography';
 
 import useStyles from './useStyles';
 
-const Layout = (props) => {
+const Layout = ({ children }) => {
     const styles = useStyles();
 
     return (
@@ -17,7 +17,7 @@ const Layout = (props) => {
                 </Typography>
             </AppBar>
             <Container className={styles.layout}>
-                {props.children}
+                {children}
             </Container>
         </div>
     );
