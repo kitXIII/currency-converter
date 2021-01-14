@@ -1,7 +1,6 @@
 import { useMemo, useEffect, useRef, useState } from 'react';
 
 import get from 'lodash/get';
-import keys from 'lodash/keys';
 import isString from 'lodash/isString';
 import isEmpty from 'lodash/isString';
 
@@ -19,7 +18,6 @@ import SwapVertIcon from '@material-ui/icons/SwapVert';
 import { useSelector, useDispatch, actions } from 'store';
 import InputNumeric from 'components/InputNumeric/InputNumeric';
 import selectStatusHelper from 'utils/statuses';
-import roundByNumOfDecPlaces from 'utils/roundByNumOfDecPlaces';
 import { VALUE_PRECISION } from 'constants/index';
 
 import useStyles from './useStyles';
@@ -28,11 +26,12 @@ const latestRequestStatusSelector = (state) => state.getLatestRequestStatus;
 
 const canBeParsed = (value) => isString(value) && value.trim() !== '';
 
+const roundByPrecision = (value, digits) => Math.round(value * `1e${digits}`) / `1e${digits}`;
+
 const App = () => {
     const styles = useStyles();
 
     const lastRequestedSymbolFrom = useRef();
-    const lastRequestedSymbolTo = useRef();
 
     const lastParsedValueFrom = useRef();
     const lastParsedValueTo = useRef();
@@ -60,18 +59,12 @@ const App = () => {
     const latestRates = useSelector((state) => state.latestRates);
     const ratioSymbolFrom = useMemo(() => get(latestRates, 'base', null), [latestRates]);
     const rates = useMemo(() => get(latestRates, 'rates', {}), [latestRates]);
-    const ratioSymbolTo = useMemo(() => keys(rates).find((key) => key !== ratioSymbolFrom), [rates, ratioSymbolFrom]);
-    const ratio = useMemo(() => rates[ratioSymbolTo], [rates, ratioSymbolTo]);
+    const ratio = useMemo(() => rates[symbolTo], [rates, symbolTo]);
 
-    const conversionAllowed = useMemo(() => ratioSymbolFrom === symbolFrom && ratioSymbolTo === symbolTo, [
-        ratioSymbolFrom,
-        ratioSymbolTo,
-        symbolFrom,
-        symbolTo
-    ]);
+    const conversionAllowed = useMemo(() => ratioSymbolFrom === symbolFrom && !isEmpty(ratio), [ratio, ratioSymbolFrom, symbolFrom]);
 
     useEffect(() => {
-        if (lastRequestedSymbolFrom.current === symbolFrom && lastRequestedSymbolTo.current === symbolTo) {
+        if (lastRequestedSymbolFrom.current === symbolFrom) {
             return;
         }
 
@@ -80,9 +73,8 @@ const App = () => {
         }
 
         lastRequestedSymbolFrom.current = symbolFrom;
-        lastRequestedSymbolTo.current = symbolTo;
 
-        dispatch(actions.getLatestForSymbols({ from: symbolFrom, to: symbolTo }));
+        dispatch(actions.getLatestForBaseSymbol(symbolFrom));
     }, [dispatch, symbolFrom, latestRequestStatus, symbolTo]);
 
     useEffect(() => {
@@ -93,13 +85,11 @@ const App = () => {
         const parsedValueFrom = canBeParsed(valueFrom) ? parseFloat(valueFrom.replace(/\s/g, '')) : 0;
         const parsedValueTo = canBeParsed(valueTo) ? parseFloat(valueTo.replace(/\s/g, '')) : 0;
 
-        console.log({ ratio, parsedValueFrom, parsedValueTo, valueFrom, valueTo, ise: isEmpty(valueFrom) });
-
         if (parsedValueFrom !== lastParsedValueFrom.current || ratio !== lastRatio.current) {
             lastParsedValueFrom.current = parsedValueFrom;
             lastRatio.current = ratio;
 
-            const convertedValueTo = roundByNumOfDecPlaces(parsedValueFrom * ratio, VALUE_PRECISION);
+            const convertedValueTo = roundByPrecision(parsedValueFrom * ratio, VALUE_PRECISION);
 
             lastParsedValueTo.current = convertedValueTo;
             dispatch(actions.setValueTo(`${convertedValueTo}`));
@@ -110,7 +100,7 @@ const App = () => {
         if (parsedValueTo !== lastParsedValueTo.current) {
             lastParsedValueTo.current = parsedValueTo;
 
-            const convertedValueFrom = roundByNumOfDecPlaces(parsedValueTo / ratio, VALUE_PRECISION);
+            const convertedValueFrom = roundByPrecision(parsedValueTo / ratio, VALUE_PRECISION);
 
             lastParsedValueFrom.current = convertedValueFrom;
             dispatch(actions.setValueFrom(`${convertedValueFrom}`));

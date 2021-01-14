@@ -32,25 +32,23 @@ export const getSymbolList = () => async (dispatch) => {
     }
 }
 
-// GET LATEST RATES FOR 2 SYMBOLS
+// GET LATEST RATES FOR BASE SYMBOL
 export const getLatestPending = createAction('GET_LATEST_PENDING');
 export const getLatestSuccess = createAction('GET_LATEST_SUCCESS');
 export const getLatestFailure = createAction('GET_LATEST_FAILURE');
 export const resetGetLatestFailure = createAction('RESET_GET_LATEST_FAILURE');
 
-export const getLatestForSymbols = (symbols) => async (dispatch) => {
+export const getLatestForBaseSymbol = (symbol) => async (dispatch) => {
     dispatch(getLatestPending());
-    const from = get(symbols, 'from', null);
-    const to = get(symbols, 'to', null);
 
-    if (!from || !to) {
+    if (!symbol) {
         throw new Error('Empty arguments');
     }
 
     try {
-        const result = await Api.getLatest({ symbols: [from, to].join(','), base: from });
+        const result = await Api.getLatest({ base: symbol });
         dispatch(getLatestSuccess(result));
     } catch (error) {
         dispatch(getLatestFailure(error));
     }
-}
+};
