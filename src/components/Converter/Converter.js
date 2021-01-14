@@ -3,6 +3,7 @@ import { useMemo, useEffect, useRef, useState } from 'react';
 import get from 'lodash/get';
 import keys from 'lodash/keys';
 import isString from 'lodash/isString';
+import isEmpty from 'lodash/isString';
 
 import Alert from '@material-ui/lab/Alert';
 import AlertTitle from '@material-ui/lab/AlertTitle';
@@ -18,16 +19,24 @@ import SwapVertIcon from '@material-ui/icons/SwapVert';
 import { useSelector, useDispatch, actions } from 'store';
 import InputNumeric from 'components/InputNumeric/InputNumeric';
 import selectStatusHelper from 'utils/statuses';
+import roundByNumOfDecPlaces from 'utils/roundByNumOfDecPlaces';
+import { VALUE_PRECISION } from 'constants/index';
 
 import useStyles from './useStyles';
 
 const latestRequestStatusSelector = (state) => state.getLatestRequestStatus;
+
+const canBeParsed = (value) => isString(value) && value.trim() !== '';
 
 const App = () => {
     const styles = useStyles();
 
     const lastRequestedSymbolFrom = useRef();
     const lastRequestedSymbolTo = useRef();
+
+    const lastParsedValueFrom = useRef();
+    const lastParsedValueTo = useRef();
+    const lastRatio = useRef();
 
     const dispatch = useDispatch();
     const latestRequestStatus = useSelector(selectStatusHelper(latestRequestStatusSelector));
@@ -48,11 +57,18 @@ const App = () => {
 
     const handleChangeFromValue = (e) => dispatch(actions.setValueFrom(e.target.value));
 
-
     const latestRates = useSelector((state) => state.latestRates);
     const ratioSymbolFrom = useMemo(() => get(latestRates, 'base', null), [latestRates]);
     const rates = useMemo(() => get(latestRates, 'rates', {}), [latestRates]);
     const ratioSymbolTo = useMemo(() => keys(rates).find((key) => key !== ratioSymbolFrom), [rates, ratioSymbolFrom]);
+    const ratio = useMemo(() => rates[ratioSymbolTo], [rates, ratioSymbolTo]);
+
+    const conversionAllowed = useMemo(() => ratioSymbolFrom === symbolFrom && ratioSymbolTo === symbolTo, [
+        ratioSymbolFrom,
+        ratioSymbolTo,
+        symbolFrom,
+        symbolTo
+    ]);
 
     useEffect(() => {
         if (lastRequestedSymbolFrom.current === symbolFrom && lastRequestedSymbolTo.current === symbolTo) {
@@ -68,6 +84,39 @@ const App = () => {
 
         dispatch(actions.getLatestForSymbols({ from: symbolFrom, to: symbolTo }));
     }, [dispatch, symbolFrom, latestRequestStatus, symbolTo]);
+
+    useEffect(() => {
+        if (!conversionAllowed) {
+            return;
+        }
+
+        const parsedValueFrom = canBeParsed(valueFrom) ? parseFloat(valueFrom.replace(/\s/g, '')) : 0;
+        const parsedValueTo = canBeParsed(valueTo) ? parseFloat(valueTo.replace(/\s/g, '')) : 0;
+
+        console.log({ ratio, parsedValueFrom, parsedValueTo, valueFrom, valueTo, ise: isEmpty(valueFrom) });
+
+        if (parsedValueFrom !== lastParsedValueFrom.current || ratio !== lastRatio.current) {
+            lastParsedValueFrom.current = parsedValueFrom;
+            lastRatio.current = ratio;
+
+            const convertedValueTo = roundByNumOfDecPlaces(parsedValueFrom * ratio, VALUE_PRECISION);
+
+            lastParsedValueTo.current = convertedValueTo;
+            dispatch(actions.setValueTo(`${convertedValueTo}`));
+
+            return;
+        }
+
+        if (parsedValueTo !== lastParsedValueTo.current) {
+            lastParsedValueTo.current = parsedValueTo;
+
+            const convertedValueFrom = roundByNumOfDecPlaces(parsedValueTo / ratio, VALUE_PRECISION);
+
+            lastParsedValueFrom.current = convertedValueFrom;
+            dispatch(actions.setValueFrom(`${convertedValueFrom}`));
+        }
+
+    }, [conversionAllowed, dispatch, ratio, valueFrom, valueTo]);
 
     const error = useSelector((state) => state.getLatestRequestError);
     const [errorMessage, setErrorMessage] = useState(null);

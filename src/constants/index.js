@@ -182,3 +182,5 @@ export const CURRENCY_SYMBOLS = {
     ZAR: 'R',
     ZWD: 'Z$'
 };
+
+export const VALUE_PRECISION = 5;

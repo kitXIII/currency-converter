@@ -8,7 +8,7 @@ import set from 'lodash/set';
 import noop from 'lodash/noop';
 
 import useNode from 'utils/useNode';
-import { CURRENCY_SYMBOLS } from 'constants/index';
+import { CURRENCY_SYMBOLS, VALUE_PRECISION } from 'constants/index';
 
 import useStyles from './useStyles';
 
@@ -20,8 +20,8 @@ const OPTIONS = {
     allowDecimalPadding: true,
     emptyInputBehavior: 'null',
     minimumValue: 0,
-    decimalPlaces: 5,
-    decimalPlacesRawValue: 5
+    decimalPlaces: VALUE_PRECISION,
+    decimalPlacesRawValue: VALUE_PRECISION
 };
 
 const InputNumeric = (props) => {
