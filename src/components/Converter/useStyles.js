@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
     },
     formControl: {
         'width': '100%',
-        paddingBottom: theme.spacing(1),
+        'paddingBottom': theme.spacing(1),
         '& + &': {
             paddingTop: theme.spacing(2)
         }
@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
         fontSize: '24px'
     },
     button_first: {
-        marginTop: theme.spacing(1),
+        'marginTop': theme.spacing(1),
         'boxShadow': 'none',
         '&:hover': {
             boxShadow: 'none',
@@ -51,12 +51,22 @@ const useStyles = makeStyles((theme) => ({
         }
     },
     button_second: {
-        'boxShadow': 'none',
+        boxShadow: 'none',
         alignSelf: 'flex-end',
         marginBottom: theme.spacing(2),
         [theme.breakpoints.up(680)]: {
             display: 'none'
         }
+    },
+    date: {
+        fontSize: 14,
+        textAlign: 'right',
+        paddingTop: theme.spacing(1)
+    },
+    info: {
+        fontSize: 14,
+        textAlign: 'left',
+        paddingTop: theme.spacing(1)
     }
 }));
 

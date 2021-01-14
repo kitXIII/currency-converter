@@ -14,6 +14,7 @@ import Paper from '@material-ui/core/Paper';
 import Select from '@material-ui/core/Select';
 import SwapHorizIcon from '@material-ui/icons/SwapHoriz';
 import SwapVertIcon from '@material-ui/icons/SwapVert';
+import Typography from '@material-ui/core/Typography';
 
 import { useSelector, useDispatch, actions } from 'store';
 import InputNumeric from 'components/InputNumeric/InputNumeric';
@@ -21,6 +22,7 @@ import selectStatusHelper from 'utils/statuses';
 import { VALUE_PRECISION } from 'constants/index';
 
 import useStyles from './useStyles';
+
 
 const latestRequestStatusSelector = (state) => state.getLatestRequestStatus;
 
@@ -57,6 +59,7 @@ const App = () => {
     const handleChangeFromValue = (e) => dispatch(actions.setValueFrom(e.target.value));
 
     const latestRates = useSelector((state) => state.latestRates);
+    const date = useMemo(() => get(latestRates, 'date', ''), [latestRates]);
     const ratioSymbolFrom = useMemo(() => get(latestRates, 'base', null), [latestRates]);
     const rates = useMemo(() => get(latestRates, 'rates', {}), [latestRates]);
     const ratio = useMemo(() => rates[symbolTo], [rates, symbolTo]);
@@ -151,6 +154,11 @@ const App = () => {
                             disabled={latestRequestStatus.isPending}
                         />
                     </FormControl>
+                    {ratio && (
+                        <Typography className={styles.info} variant='overline' component='p'>
+                            {`1 ${symbolFrom} ≈ ${ratio} ${symbolTo}`}
+                        </Typography>
+                    )}
                 </div>
                 <Fab
                     className={styles.button_first}
@@ -184,6 +192,11 @@ const App = () => {
                             disabled={latestRequestStatus.isPending}
                         />
                     </FormControl>
+                    {date && (
+                        <Typography className={styles.date} variant='overline' component='p'>
+                            {date}
+                        </Typography>
+                    )}
                 </div>
             </Paper>
             <Fab className={styles.button_second} aria-label='change symbols' onClick={handleChangeSymbols}>
